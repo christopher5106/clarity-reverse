@@ -24,11 +24,11 @@ class Predictor(BasePredictor):
         
         startup_timer = timer.startup_timer
         startup_timer.record("launcher")
-        
+        print("initializing") 
         initialize.imports()
         initialize.check_versions()
         initialize.initialize()
-        
+        print("initializing done")        
         app = FastAPI()
         initialize_util.setup_middleware(app)
         
@@ -297,6 +297,11 @@ class Predictor(BasePredictor):
                 
             first_iteration = False
 
+            print(f"creativity: {creativity}")
+            print(f"tiling_width: {tiling_width}")
+            print(f"tiling_height: {tiling_height}")
+
+
             payload = {
                 "override_settings": {
                     "sd_model_checkpoint": sd_model,
@@ -370,7 +375,9 @@ class Predictor(BasePredictor):
                 }
             }
 
+            print("request")
             req = self.StableDiffusionImg2ImgProcessingAPI(**payload)
+            print("response")
             resp = self.api.img2imgapi(req)
             info = json.loads(resp.info)
 

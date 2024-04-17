@@ -438,9 +438,11 @@ class Api:
                 try:
                     shared.state.begin(job="scripts_img2img")
                     if selectable_scripts is not None:
+                        print("scripts_img2img selectable")
                         p.script_args = script_args
                         processed = scripts.scripts_img2img.run(p, *p.script_args) # Need to pass args as list here
                     else:
+                        print("tuple script_args")
                         p.script_args = tuple(script_args) # Need to pass args as tuple here
                         processed = process_images(p)
                 finally:
