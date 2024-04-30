@@ -78,6 +78,7 @@ class CFGDenoiserKDiffusion(sd_samplers_cfg_denoiser.CFGDenoiser):
 
 class KDiffusionSampler(sd_samplers_common.Sampler):
     def __init__(self, funcname, sd_model, options=None):
+        print("(KDiffusionSampler) init")
         super().__init__(funcname)
 
         self.extra_params = sampler_extra_params.get(funcname, [])
@@ -89,6 +90,7 @@ class KDiffusionSampler(sd_samplers_common.Sampler):
         self.model_wrap = self.model_wrap_cfg.inner_model
 
     def get_sigmas(self, p, steps):
+        print("(KDiffusionSampler) get sigmas")
         discard_next_to_last_sigma = self.config is not None and self.config.options.get('discard_next_to_last_sigma', False)
         if opts.always_discard_next_to_last_sigma and not discard_next_to_last_sigma:
             discard_next_to_last_sigma = True
@@ -139,6 +141,8 @@ class KDiffusionSampler(sd_samplers_common.Sampler):
         return sigmas
 
     def sample_img2img(self, p, x, noise, conditioning, unconditional_conditioning, steps=None, image_conditioning=None):
+        print("(KDiffusionSampler) sample_img2img")
+
         steps, t_enc = sd_samplers_common.setup_img2img_steps(p, steps)
 
         sigmas = self.get_sigmas(p, steps)
@@ -193,6 +197,7 @@ class KDiffusionSampler(sd_samplers_common.Sampler):
         return samples
 
     def sample(self, p, x, conditioning, unconditional_conditioning, steps=None, image_conditioning=None):
+        print("(KDiffusionSampler) sample")
         steps = steps or p.steps
 
         sigmas = self.get_sigmas(p, steps)
