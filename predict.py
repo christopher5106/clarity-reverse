@@ -231,6 +231,9 @@ class Predictor(BasePredictor):
         )
     ) -> list[Path]:
         """Run a single prediction on the model"""
+        print("")
+        print("")
+        print("#"*100)
         print("(predict) Running prediction")
         start_time = time.time()
         
