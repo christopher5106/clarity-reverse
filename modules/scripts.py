@@ -538,7 +538,7 @@ class ScriptRunner:
                 script.alwayson = True
 
             elif visibility:
-                print("(ScriptRunner initialize_scripts) appending script", script)
+                print("(ScriptRunner initialize_scripts) appending selectable script", script)
                 self.scripts.append(script)
                 self.selectable_scripts.append(script)
 
