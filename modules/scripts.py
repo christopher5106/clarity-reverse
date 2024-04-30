@@ -495,6 +495,7 @@ def wrap_call(func, filename, funcname, *args, default=None, **kwargs):
 
 class ScriptRunner:
     def __init__(self):
+        print("(ScriptRunner init)")
         self.scripts = []
         self.selectable_scripts = []
         self.alwayson_scripts = []
@@ -511,6 +512,8 @@ class ScriptRunner:
         """dict of callbacks to be called after an element is created; key=elem_id, value=list of callbacks"""
 
     def initialize_scripts(self, is_img2img):
+        print("(ScriptRunner initialize_scripts)")
+
         from modules import scripts_auto_postprocessing
 
         self.scripts.clear()
@@ -540,6 +543,8 @@ class ScriptRunner:
         self.apply_on_before_component_callbacks()
 
     def apply_on_before_component_callbacks(self):
+        print("(ScriptRunner apply_on_before_component_callbacks)")
+
         for script in self.scripts:
             on_before = script.on_before_component_elem_id or []
             on_after = script.on_after_component_elem_id or []
@@ -561,6 +566,8 @@ class ScriptRunner:
 
     def create_script_ui(self, script):
 
+        print("(ScriptRunner create_script_ui)")
+
         script.args_from = len(self.inputs)
         script.args_to = len(self.inputs)
 
@@ -570,6 +577,8 @@ class ScriptRunner:
             errors.report(f"Error creating UI for {script.name}: ", exc_info=True)
 
     def create_script_ui_inner(self, script):
+        print("(ScriptRunner create_script_ui_inner)")
+
         import modules.api.models as api_models
 
         controls = wrap_call(script.ui, script.filename, "ui", script.is_img2img)
@@ -614,6 +623,8 @@ class ScriptRunner:
         script.args_to = len(self.inputs)
 
     def setup_ui_for_section(self, section, scriptlist=None):
+        print("(ScriptRunner setup_ui_for_section)")
+
         if scriptlist is None:
             scriptlist = self.alwayson_scripts
 
@@ -630,9 +641,13 @@ class ScriptRunner:
                 self.create_script_ui(script)
 
     def prepare_ui(self):
+        print("(ScriptRunner prepare_ui)")
+
         self.inputs = [None]
 
     def setup_ui(self):
+        print("(ScriptRunner setup_ui)")
+
         all_titles = [wrap_call(script.title, script.filename, "title") or script.filename for script in self.scripts]
         self.title_map = {title.lower(): script for title, script in zip(all_titles, self.scripts)}
         self.titles = [wrap_call(script.title, script.filename, "title") or f"{script.filename} [error]" for script in self.selectable_scripts]
@@ -645,12 +660,17 @@ class ScriptRunner:
         self.setup_ui_for_section(None, self.selectable_scripts)
 
         def select_script(script_index):
+            print("(ScriptRunner select_script) script_index-1:", script_index -1)
+            print("(ScriptRunner select_script) selectable scripts", self.selectable_scripts)
+
             selected_script = self.selectable_scripts[script_index - 1] if script_index>0 else None
 
             return [gr.update(visible=selected_script == s) for s in self.selectable_scripts]
 
         def init_field(title):
             """called when an initial value is set from ui-config.json to show script's UI components"""
+            print("(ScriptRunner init_field)")
+
 
             if title == 'None':
                 return
@@ -686,6 +706,8 @@ class ScriptRunner:
         return self.inputs
 
     def run(self, p, *args):
+        print("(ScriptRunner run)")
+
         script_index = args[0]
 
         if script_index == 0:
@@ -704,6 +726,8 @@ class ScriptRunner:
         return processed
 
     def before_process(self, p):
+        print("(ScriptRunner before_process)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -712,6 +736,8 @@ class ScriptRunner:
                 errors.report(f"Error running before_process: {script.filename}", exc_info=True)
 
     def process(self, p):
+        print("(ScriptRunner process)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -720,6 +746,8 @@ class ScriptRunner:
                 errors.report(f"Error running process: {script.filename}", exc_info=True)
 
     def before_process_batch(self, p, **kwargs):
+        print("(ScriptRunner before_process_batch)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -728,6 +756,8 @@ class ScriptRunner:
                 errors.report(f"Error running before_process_batch: {script.filename}", exc_info=True)
 
     def after_extra_networks_activate(self, p, **kwargs):
+        print("(ScriptRunner after_extra_netwarks_activate)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -736,6 +766,8 @@ class ScriptRunner:
                 errors.report(f"Error running after_extra_networks_activate: {script.filename}", exc_info=True)
 
     def process_batch(self, p, **kwargs):
+        print("(ScriptRunner process_batch)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -744,6 +776,8 @@ class ScriptRunner:
                 errors.report(f"Error running process_batch: {script.filename}", exc_info=True)
 
     def postprocess(self, p, processed):
+        print("(ScriptRunner post_process)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -752,6 +786,8 @@ class ScriptRunner:
                 errors.report(f"Error running postprocess: {script.filename}", exc_info=True)
 
     def postprocess_batch(self, p, images, **kwargs):
+        print("(ScriptRunner post_process_batch)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -760,6 +796,8 @@ class ScriptRunner:
                 errors.report(f"Error running postprocess_batch: {script.filename}", exc_info=True)
 
     def postprocess_batch_list(self, p, pp: PostprocessBatchListArgs, **kwargs):
+        print("(ScriptRunner postprocess_batch_list)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -768,6 +806,8 @@ class ScriptRunner:
                 errors.report(f"Error running postprocess_batch_list: {script.filename}", exc_info=True)
 
     def postprocess_image(self, p, pp: PostprocessImageArgs):
+        print("(ScriptRunner process_image)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -776,6 +816,8 @@ class ScriptRunner:
                 errors.report(f"Error running postprocess_image: {script.filename}", exc_info=True)
 
     def before_component(self, component, **kwargs):
+        print("(ScriptRunner before_component)")
+
         for callback, script in self.on_before_component_elem_id.get(kwargs.get("elem_id"), []):
             try:
                 callback(OnComponent(component=component))
@@ -789,6 +831,8 @@ class ScriptRunner:
                 errors.report(f"Error running before_component: {script.filename}", exc_info=True)
 
     def after_component(self, component, **kwargs):
+        print("(ScriptRunner after_component)")
+
         for callback, script in self.on_after_component_elem_id.get(component.elem_id, []):
             try:
                 callback(OnComponent(component=component))
@@ -802,9 +846,12 @@ class ScriptRunner:
                 errors.report(f"Error running after_component: {script.filename}", exc_info=True)
 
     def script(self, title):
+        print("(ScriptRunner script)")
         return self.title_map.get(title.lower())
 
     def reload_sources(self, cache):
+        print("(ScriptRunner reload_sources)")
+
         for si, script in list(enumerate(self.scripts)):
             args_from = script.args_from
             args_to = script.args_to
@@ -823,6 +870,8 @@ class ScriptRunner:
                     self.scripts[si].args_to = args_to
 
     def before_hr(self, p):
+        print("(ScriptRunner before_hr)")
+
         for script in self.alwayson_scripts:
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
@@ -831,6 +880,8 @@ class ScriptRunner:
                 errors.report(f"Error running before_hr: {script.filename}", exc_info=True)
 
     def setup_scrips(self, p, *, is_ui=True):
+        print("(ScriptRunner setup_scrips)")
+
         for script in self.alwayson_scripts:
             if not is_ui and script.setup_for_ui_only:
                 continue
