@@ -13,16 +13,15 @@ AlwaysVisible = object()
 
 import json
 def xxx(args):
-    # res = {}
-    # for k, v in args.items():
-    #     if len(v) < 50:
-    #         res[k] = v
-    # return json.dumps(res, indent=2)
-    print(args)
-    print(len(args))
-    print(args[0])
-    exit()
-    return f"{type(args[0])} - {type(args[1])} - {len(args)}"
+    args = list(args)
+    res = []
+    for x in args:
+        x = str(x)
+        if len(x) < 50:
+            res.append(x)
+        else:
+            res.append(x[:50]+"...")
+    return "(" + ", ".join(res) + ")"
 
 class PostprocessImageArgs:
     def __init__(self, image):
