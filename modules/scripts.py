@@ -28,7 +28,7 @@ def xxx(args):
     for x in list(args):
         if isinstance(x, dict):
             new_dict = {}
-            for k, v in x:
+            for k, v in x.items():
                 v = str(v)
                 if len(v) > 50:
                     new_dict[k] = v[:50] + "..."
