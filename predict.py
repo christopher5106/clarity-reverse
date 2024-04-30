@@ -375,7 +375,7 @@ class Predictor(BasePredictor):
                 }
             }
 
-            print("(predict) payload", payload)
+            # print("(predict) payload", payload)
             print("(predict) StableDiffusionImg2ImgProcessingAPI request")
             req = self.StableDiffusionImg2ImgProcessingAPI(**payload)
             print("(predict) response from self.api.img2imgapi(req)")

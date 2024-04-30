@@ -1389,7 +1389,7 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
             self.mask_blur_y = value
 
     def init(self, all_prompts, all_seeds, all_subseeds):
-        print("(StableDiffusionProcessingImg2Img init)")
+        print("\n\n(StableDiffusionProcessingImg2Img init)")
         self.image_cfg_scale: float = self.image_cfg_scale if shared.sd_model.cond_stage_key == "edit" else None
 
         self.sampler = sd_samplers.create_sampler(self.sampler_name, self.sd_model)
@@ -1532,7 +1532,7 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
 
 
     def sample(self, conditioning, unconditional_conditioning, seeds, subseeds, subseed_strength, prompts):
-        print("(StableDiffusionProcessingImg2Img sample)")
+        print("(StableDiffusionProcessingImg2Img sample) self.sampler type", type(self.sampler))
 
         x = self.rng.next()
 
