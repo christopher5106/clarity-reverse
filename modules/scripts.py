@@ -439,6 +439,7 @@ def list_files_with_name(filename):
 
 
 def load_scripts():
+    print("(load_scripts)")
     global current_basedir
     scripts_data.clear()
     postprocessing_scripts_data.clear()
@@ -662,17 +663,16 @@ class ScriptRunner:
         self.setup_ui_for_section(None, self.selectable_scripts)
 
         def select_script(script_index):
-            print("(ScriptRunner select_script) script_index-1:", script_index -1)
             print("(ScriptRunner select_script) selectable scripts", self.selectable_scripts)
+            print("(ScriptRunner select_script) script_index-1:", script_index -1)
 
             selected_script = self.selectable_scripts[script_index - 1] if script_index>0 else None
-
+            print("(ScriptRunner select_script) selected script:", selected_script)
             return [gr.update(visible=selected_script == s) for s in self.selectable_scripts]
 
         def init_field(title):
             """called when an initial value is set from ui-config.json to show script's UI components"""
             print("(ScriptRunner init_field)")
-
 
             if title == 'None':
                 return
@@ -708,19 +708,22 @@ class ScriptRunner:
         return self.inputs
 
     def run(self, p, *args):
-        print("(ScriptRunner run)")
+
 
         script_index = args[0]
+        print("(ScriptRunner run) script_index ", script_index)
 
         if script_index == 0:
             return None
 
         script = self.selectable_scripts[script_index-1]
+        print("(ScriptRunner run) running ", script)
 
         if script is None:
             return None
 
         script_args = args[script.args_from:script.args_to]
+        print("(ScriptRunner run) script args", script_args)
         processed = script.run(p, *script_args)
 
         shared.total_tqdm.clear()
@@ -731,8 +734,10 @@ class ScriptRunner:
         print("(ScriptRunner before_process)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner before_process) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner before_process) script args", script_args)
                 script.before_process(p, *script_args)
             except Exception:
                 errors.report(f"Error running before_process: {script.filename}", exc_info=True)
@@ -741,8 +746,10 @@ class ScriptRunner:
         print("(ScriptRunner process)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner process) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner process) script args", script_args)
                 script.process(p, *script_args)
             except Exception:
                 errors.report(f"Error running process: {script.filename}", exc_info=True)
@@ -751,8 +758,10 @@ class ScriptRunner:
         print("(ScriptRunner before_process_batch)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner before_process_batch) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner before_process_batch) script args", script_args)
                 script.before_process_batch(p, *script_args, **kwargs)
             except Exception:
                 errors.report(f"Error running before_process_batch: {script.filename}", exc_info=True)
@@ -771,8 +780,10 @@ class ScriptRunner:
         print("(ScriptRunner process_batch)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner process_batch) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner process_batch) script_args", script_args)
                 script.process_batch(p, *script_args, **kwargs)
             except Exception:
                 errors.report(f"Error running process_batch: {script.filename}", exc_info=True)
@@ -781,8 +792,10 @@ class ScriptRunner:
         print("(ScriptRunner post_process)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner post_process) script")
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner post_process) script args", script_args)
                 script.postprocess(p, processed, *script_args)
             except Exception:
                 errors.report(f"Error running postprocess: {script.filename}", exc_info=True)
@@ -791,8 +804,10 @@ class ScriptRunner:
         print("(ScriptRunner post_process_batch)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner post_process_batch) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner post_process_batch) script args", script_args)
                 script.postprocess_batch(p, *script_args, images=images, **kwargs)
             except Exception:
                 errors.report(f"Error running postprocess_batch: {script.filename}", exc_info=True)
@@ -801,8 +816,10 @@ class ScriptRunner:
         print("(ScriptRunner postprocess_batch_list)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner postprocess_batch_list) script", script)
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner postprocess_batch_list) script_args", script_args)
                 script.postprocess_batch_list(p, pp, *script_args, **kwargs)
             except Exception:
                 errors.report(f"Error running postprocess_batch_list: {script.filename}", exc_info=True)
@@ -811,8 +828,10 @@ class ScriptRunner:
         print("(ScriptRunner process_image)")
 
         for script in self.alwayson_scripts:
+            print("(ScriptRunner process_image) script")
             try:
                 script_args = p.script_args[script.args_from:script.args_to]
+                print("(ScriptRunner process_image) script_args", script_args)
                 script.postprocess_image(p, pp, *script_args)
             except Exception:
                 errors.report(f"Error running postprocess_image: {script.filename}", exc_info=True)
