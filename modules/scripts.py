@@ -12,16 +12,34 @@ from modules import shared, paths, script_callbacks, extensions, script_loading,
 AlwaysVisible = object()
 
 import json
+# def xxx(args):
+#     args = list(args)
+#     res = []
+#     for x in args:
+#         x = str(x)
+#         if len(x) < 50:
+#             res.append(x)
+#         else:
+#             res.append(x[:50]+"...")
+#     return "(" + ", ".join(res) + ")"
+
 def xxx(args):
-    args = list(args)
     res = []
-    for x in args:
-        x = str(x)
-        if len(x) < 50:
-            res.append(x)
+    for x in list(args):
+        if isinstance(x, dict):
+            new_dict = {}
+            for k, v in x:
+                v = str(v)
+                if len(v) > 50:
+                    new_dict[k] = v[:50] + "..."
+                else:
+                    new_dict[k] = v
+            res.append(str(new_dict))
         else:
-            res.append(x[:50]+"...")
+            res.append(x)
+
     return "(" + ", ".join(res) + ")"
+
 
 class PostprocessImageArgs:
     def __init__(self, image):
