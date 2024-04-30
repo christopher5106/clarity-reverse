@@ -410,7 +410,7 @@ class Api:
             print("(img2imgapi) not default_script_arg_img2img")
             self.default_script_arg_img2img = self.init_default_script_args(script_runner)
         selectable_scripts, selectable_script_idx = self.get_selectable_script(img2imgreq.script_name, script_runner)
-        print("(img2imgapi) selectable_scripts selectable_script_idx")
+        print("(img2imgapi) selectable_scripts selectable_script_idx", selectable_scripts, selectable_script_idx)
 
         print("(img2imgapi) populate img2imgreq")
         populate = img2imgreq.copy(update={  # Override __init__ params
