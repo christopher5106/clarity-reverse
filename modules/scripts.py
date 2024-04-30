@@ -18,7 +18,7 @@ def xxx(args):
     #     if len(v) < 50:
     #         res[k] = v
     # return json.dumps(res, indent=2)
-    return type(args)
+    return f"{type(args[0])} - {type(args[1])} - {len(args)}"
 
 class PostprocessImageArgs:
     def __init__(self, image):
