@@ -889,7 +889,7 @@ def process_images_inner(p: StableDiffusionProcessing) -> Processed:
             if getattr(samples_ddim, 'already_decoded', False):
                 print("(process_images_inner) already_decoded")
                 x_samples_ddim = samples_ddim
-            else
+            else:
                 print("(process_images_inner) decode")
                 if opts.sd_vae_decode_method != 'Full':
                     p.extra_generation_params['VAE Decoder'] = opts.sd_vae_decode_method
