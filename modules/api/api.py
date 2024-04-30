@@ -391,6 +391,7 @@ class Api:
         return models.TextToImageResponse(images=b64images, parameters=vars(txt2imgreq), info=processed.js())
 
     def img2imgapi(self, img2imgreq: models.StableDiffusionImg2ImgProcessingAPI):
+        print("(img2imgapi)")
         init_images = img2imgreq.init_images
         if init_images is None:
             raise HTTPException(status_code=404, detail="Init image not found")
@@ -400,13 +401,17 @@ class Api:
             mask = decode_base64_to_image(mask)
 
         script_runner = scripts.scripts_img2img
+        print("(img2imgapi) script_runner", type(script_runner))
         if not script_runner.scripts:
             script_runner.initialize_scripts(True)
             ui.create_ui()
         if not self.default_script_arg_img2img:
+            print("(img2imgapi) not default_script_arg_img2img")
             self.default_script_arg_img2img = self.init_default_script_args(script_runner)
         selectable_scripts, selectable_script_idx = self.get_selectable_script(img2imgreq.script_name, script_runner)
+        print("(img2imgapi) selectable_scripts selectable_script_idx")
 
+        print("(img2imgapi) populate img2imgreq")
         populate = img2imgreq.copy(update={  # Override __init__ params
             "sampler_name": validate_sampler_name(img2imgreq.sampler_name or img2imgreq.sampler_index),
             "do_not_save_samples": not img2imgreq.save_images,
@@ -422,6 +427,7 @@ class Api:
         args.pop('script_args', None)  # will refeed them to the pipeline directly after initializing them
         args.pop('alwayson_scripts', None)
 
+        print("(img2imgapi) init_script_args")
         script_args = self.init_script_args(img2imgreq, self.default_script_arg_img2img, selectable_scripts, selectable_script_idx, script_runner)
 
         send_images = args.pop('send_images', True)
@@ -429,6 +435,8 @@ class Api:
 
         with self.queue_lock:
             with closing(StableDiffusionProcessingImg2Img(sd_model=shared.sd_model, **args)) as p:
+
+                print("(img2imgapi) opening StableDiffusionProcessingImg2Img")
                 p.init_images = [decode_base64_to_image(x) for x in init_images]
                 p.is_api = True
                 p.scripts = script_runner
@@ -438,12 +446,12 @@ class Api:
                 try:
                     shared.state.begin(job="scripts_img2img")
                     if selectable_scripts is not None:
-                        print("scripts_img2img selectable")
                         p.script_args = script_args
+                        print("(img2imgapi)  scripts_img2img run (selectable_script not None)")
                         processed = scripts.scripts_img2img.run(p, *p.script_args) # Need to pass args as list here
                     else:
-                        print("tuple script_args")
                         p.script_args = tuple(script_args) # Need to pass args as tuple here
+                        print("(img2imgapi) process_images (selectable_script is None)")
                         processed = process_images(p)
                 finally:
                     shared.state.end()
@@ -455,6 +463,7 @@ class Api:
             img2imgreq.init_images = None
             img2imgreq.mask = None
 
+        print("(img2imgapi) models.ImageToImageResponse")
         return models.ImageToImageResponse(images=b64images, parameters=vars(img2imgreq), info=processed.js())
 
     def extras_single_image_api(self, req: models.ExtrasSingleImageRequest):

@@ -1368,6 +1368,8 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
     init_latent: torch.Tensor = field(default=None, init=False)
 
     def __post_init__(self):
+        print("(StableDiffusionProcessingImg2Img post init)")
+
         super().__post_init__()
 
         self.image_mask = self.mask
@@ -1387,6 +1389,7 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
             self.mask_blur_y = value
 
     def init(self, all_prompts, all_seeds, all_subseeds):
+        print("(StableDiffusionProcessingImg2Img init)")
         self.image_cfg_scale: float = self.image_cfg_scale if shared.sd_model.cond_stage_key == "edit" else None
 
         self.sampler = sd_samplers.create_sampler(self.sampler_name, self.sd_model)
@@ -1395,6 +1398,7 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
         image_mask = self.image_mask
 
         if image_mask is not None:
+            print("(StableDiffusionProcessingImg2Img init) image_mask not None")
             # image_mask is passed in as RGBA by Gradio to support alpha masks,
             # but we still want to support binary masks.
             image_mask = create_binary_mask(image_mask)
@@ -1436,7 +1440,9 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
 
         add_color_corrections = opts.img2img_color_correction and self.color_corrections is None
         if add_color_corrections:
+            print("(StableDiffusionProcessingImg2Img init) color corrections", self.color_corrections)
             self.color_corrections = []
+
         imgs = []
         for img in self.init_images:
 
@@ -1473,6 +1479,7 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
 
             imgs.append(image)
 
+        print("(StableDiffusionProcessingImg2Img init) len(imgs)", len(imgs))
         if len(imgs) == 1:
             batch_images = np.expand_dims(imgs[0], axis=0).repeat(self.batch_size, axis=0)
             if self.overlay_images is not None:
@@ -1492,14 +1499,18 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
 
         if opts.sd_vae_encode_method != 'Full':
             self.extra_generation_params['VAE Encoder'] = opts.sd_vae_encode_method
+            print("(StableDiffusionProcessingImg2Img init) extra generation params vae encoder", opts.sd_vae_encode_method)
 
         self.init_latent = images_tensor_to_samples(image, approximation_indexes.get(opts.sd_vae_encode_method), self.sd_model)
         devices.torch_gc()
 
         if self.resize_mode == 3:
+            print("(StableDiffusionProcessingImg2Img init) resize_mode", self.resize_mode)
             self.init_latent = torch.nn.functional.interpolate(self.init_latent, size=(self.height // opt_f, self.width // opt_f), mode="bilinear")
 
         if image_mask is not None:
+            print("(StableDiffusionProcessingImg2Img init) image_mask2")
+
             init_mask = latent_mask
             latmask = init_mask.convert('RGB').resize((self.init_latent.shape[3], self.init_latent.shape[2]))
             latmask = np.moveaxis(np.array(latmask, dtype=np.float32), 2, 0) / 255
@@ -1516,9 +1527,13 @@ class StableDiffusionProcessingImg2Img(StableDiffusionProcessing):
             elif self.inpainting_fill == 3:
                 self.init_latent = self.init_latent * self.mask
 
+        print("(StableDiffusionProcessingImg2Img init) image_conditioning")
         self.image_conditioning = self.img2img_image_conditioning(image * 2 - 1, self.init_latent, image_mask)
 
+
     def sample(self, conditioning, unconditional_conditioning, seeds, subseeds, subseed_strength, prompts):
+        print("(StableDiffusionProcessingImg2Img sample)")
+
         x = self.rng.next()
 
         if self.initial_noise_multiplier != 1.0:

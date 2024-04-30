@@ -24,11 +24,11 @@ class Predictor(BasePredictor):
         
         startup_timer = timer.startup_timer
         startup_timer.record("launcher")
-        print("initializing") 
+        print("(setup) initializing")
         initialize.imports()
         initialize.check_versions()
         initialize.initialize()
-        print("initializing done")        
+        print("(setup) initializing done")
         app = FastAPI()
         initialize_util.setup_middleware(app)
         
@@ -38,7 +38,7 @@ class Predictor(BasePredictor):
         self.api = Api(app, queue_lock)
         
         model_response = self.api.get_sd_models()
-        print("Available checkpoints: ", str(model_response))
+        print("(setup) Available checkpoints: ", str(model_response))
 
         from modules import script_callbacks
         script_callbacks.before_ui_callback()
@@ -126,7 +126,7 @@ class Predictor(BasePredictor):
         req = StableDiffusionImg2ImgProcessingAPI(**payload)
         self.api.img2imgapi(req)
 
-        print(f"Startup time: {startup_timer.summary()}.")
+        print(f"(setup) Startup time: {startup_timer.summary()}.")
 
     def download_lora_weights(self, url: str):
         folder_path = "models/Lora"
@@ -231,7 +231,7 @@ class Predictor(BasePredictor):
         )
     ) -> list[Path]:
         """Run a single prediction on the model"""
-        print("Running prediction")
+        print("(predict) Running prediction")
         start_time = time.time()
         
         # checkpoint name changed bc hashing is deactivated so name is corrected here to old name to avoid breaking api calls
@@ -281,12 +281,12 @@ class Predictor(BasePredictor):
         multipliers = [scale_factor]
         if scale_factor > 2:
             multipliers = self.calc_scale_factors(scale_factor)
-            print("Upscale your image " + str(len(multipliers)) + " times")
+            print("(predict) Upscale your image " + str(len(multipliers)) + " times")
         
         first_iteration = True
 
         for multiplier in multipliers:
-            print("Upscaling with scale_factor: ", multiplier)
+            print("(predict) Upscaling with scale_factor: ", multiplier)
             
             if not first_iteration:
                 creativity = creativity * 0.8
@@ -297,9 +297,9 @@ class Predictor(BasePredictor):
                 
             first_iteration = False
 
-            print(f"creativity: {creativity}")
-            print(f"tiling_width: {tiling_width}")
-            print(f"tiling_height: {tiling_height}")
+            print(f"(predict) creativity: {creativity}")
+            print(f"(predict) tiling_width: {tiling_width}")
+            print(f"(predict) tiling_height: {tiling_height}")
 
 
             payload = {
@@ -375,14 +375,17 @@ class Predictor(BasePredictor):
                 }
             }
 
-            print("request")
+            print("(predict) payload", payload)
+            print("(predict) StableDiffusionImg2ImgProcessingAPI request")
             req = self.StableDiffusionImg2ImgProcessingAPI(**payload)
-            print("response")
+            print("(predict) response from self.api.img2imgapi(req)")
             resp = self.api.img2imgapi(req)
             info = json.loads(resp.info)
 
             base64_image = resp.images[0]
 
+
+        print("(predict) saving output images")
         outputs = []
 
         for i, image in enumerate(resp.images):
@@ -395,8 +398,8 @@ class Predictor(BasePredictor):
         
         if custom_sd_model:
             os.remove(path_to_custom_checkpoint)
-            print(f"Custom checkpoint {path_to_custom_checkpoint} has been removed.")
+            print(f"(predict) Custom checkpoint {path_to_custom_checkpoint} has been removed.")
 
-        print(f"Prediction took {round(time.time() - start_time,2)} seconds")
+        print(f"(predict) Prediction took {round(time.time() - start_time,2)} seconds")
         return outputs
     

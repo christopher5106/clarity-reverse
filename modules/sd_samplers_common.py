@@ -86,6 +86,7 @@ def samples_to_image_grid(samples, approximation=None):
 
 def images_tensor_to_samples(image, approximation=None, model=None):
     '''image[0, 1] -> latent'''
+    print("(images_tensor_to_samples) approximation", approximation)
     if approximation is None:
         approximation = approximation_indexes.get(opts.sd_vae_encode_method, 0)
 
