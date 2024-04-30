@@ -532,11 +532,13 @@ class ScriptRunner:
             visibility = script.show(script.is_img2img)
 
             if visibility == AlwaysVisible:
+                print("(ScriptRunner initialize_scripts) appending always visible script", script)
                 self.scripts.append(script)
                 self.alwayson_scripts.append(script)
                 script.alwayson = True
 
             elif visibility:
+                print("(ScriptRunner initialize_scripts) appending script", script)
                 self.scripts.append(script)
                 self.selectable_scripts.append(script)
 
