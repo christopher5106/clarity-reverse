@@ -36,7 +36,7 @@ def xxx(args):
                     new_dict[k] = v
             res.append(str(new_dict))
         else:
-            res.append(x)
+            res.append(str(x))
 
     return "(" + ", ".join(res) + ")"
 
